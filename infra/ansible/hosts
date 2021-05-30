@@ -1,0 +1,5 @@
+[all]
+localhost
+
+[docker_builders]
+localhost

@@ -1,0 +1,252 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ro.utm.lic2021</groupId>
+	<artifactId>l-app</artifactId>
+	<version>0.1</version>
+	<name>l-app</name>
+
+	<properties>
+		<!-- properties transferate la pluginul properties-maven-plugin https://www.mojohaus.org/properties-maven-plugin/usage.html -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Versiuni platformă - JVM -->
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<!-- Versiuni platformă - Servlet -->
+		<tomcat.ver.full>7.0.103</tomcat.ver.full>
+		<!-- <tomcat.ver.full>8.5.60</tomcat.ver.full>  -->
+		<tomcat.ver.major>7</tomcat.ver.major>
+		<servlet.family>tomcat</servlet.family>
+
+		<!-- Versiuni API, librării folosite de aplicație -->
+		<apachecommonsio.version>2.8.0</apachecommonsio.version>
+		<tomcatloggingjuli.version>9.0.0.M6</tomcatloggingjuli.version>
+		<javaxservletapi.version>3.0.1</javaxservletapi.version>
+		<!-- Comptabililitate Derby: https://db.apache.org/derby/derby_downloads.html 
+			Ultima versiune compatibilă cu Java 8 este 10.14.2.0 Versiunile 10.15.x (ex: 
+			10.15.2.0) necesită Java 9 sau mai recent -->
+
+		<!-- Derby 10.14.2 este compatibil cu Java 8 -->
+		<derby.version>10.14.2.0</derby.version>
+
+		<!-- Versiuni module maven etc -->
+		<cargomaven.name>cargo-maven2-plugin</cargomaven.name>
+		<mavencompiler.version>3.1</mavencompiler.version>
+		<mavenartifact.version>3.3.9</mavenartifact.version>
+		<mavenwar.version>3.3.1</mavenwar.version>
+		<mavendependency.version>3.1.2</mavendependency.version>
+		<cargomaven.version>1.8.5</cargomaven.version>
+		
+		<!-- Versiuni instrumente test -->
+		<surefire.version>2.22.2</surefire.version>
+		<junit.version>4.11</junit.version>
+
+		<!-- Parametri Cargo container, momentan neutilizați <tomcat.http.port>8180</tomcat.http.port> 
+			<tomcat.ajp.port>8190</tomcat.ajp.port> -->
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${javaxservletapi.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>${tomcat.ver.full}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-logging-juli</artifactId>
+			<version>${tomcatloggingjuli.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Apache Derby in-memory JDBC database engine -->
+		<!-- Cod exemplificare: https://db.apache.org/derby/integrate/DerbyTomcat5512JPetStor.html -->
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>${derby.version}</version>
+		</dependency>
+		<!-- Derby Client -->
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbyclient</artifactId>
+			<version>${derby.version}</version>
+		</dependency>
+		<!-- Derby tools, required by embedded derby server -->
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
+			<version>${derby.version}</version>
+		</dependency>
+
+		<!-- Apache tomcat <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>tomcat</artifactId> 
+			<version>${tomcat.ver.full}</version> <type>pom</type> </dependency> -->
+		<!-- Cargo permite lansarea unui container servlet direct de către Maven, 
+			în etapa integration-test https://codehaus-cargo.github.io/cargo/Features.html -->
+		<dependency>
+			<groupId>org.codehaus.cargo</groupId>
+			<artifactId>${cargomaven.name}</artifactId>
+			<version>${cargomaven.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- Comparare versiuni -->
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+			<version>${mavenartifact.version}</version>
+		</dependency>
+
+		<!-- Apache Commons IO este necesară în rutinele HTTP Client pentru testare -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${apachecommonsio.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0.0</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>etc/build.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${mavencompiler.version}</version>
+				<configuration>
+					<compilerArgs>
+						<arg>-Xlint:all</arg>
+						<arg>-Xmaxwarns</arg>
+						<arg>50000</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<!-- Output-ul artefactelor se face cu împachetare war -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${mavenwar.version}</version>
+				<configuration>
+					<warName>${project.name}-${project.version}-java${maven.compiler.target}</warName>
+				</configuration>
+			</plugin>
+
+			<!-- Surefire generează rapoarte privind testele JUnit Fișierele *IT.java 
+				sunt considerate parte a testului de integrare -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire.version}</version>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>none</exclude>
+							</excludes>
+							<includes>
+								<include>**/*IT.java</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Plugin-ul Cargo lansează un container servlet, cu platforma și versiunea 
+				dorite de dezvoltator, în etapa de test integrare Containerul este oprit 
+				după executarea acestor teste. -->
+			<plugin>
+				<groupId>org.codehaus.cargo</groupId>
+				<artifactId>${cargomaven.name}</artifactId>
+				<version>${cargomaven.version}</version>
+				<executions>
+					<execution>
+						<id>start-container-tomcat</id>
+						<phase>pre-integration-test</phase>
+						<configuration>
+							<container>
+								<containerId>tomcat${tomcat.ver.major}x</containerId>
+								<artifactInstaller>
+									<groupId>org.apache.tomcat</groupId>
+									<artifactId>tomcat</artifactId>
+									<version>${tomcat.ver.full}</version>
+									<type>tar.gz</type>
+								</artifactInstaller>
+								<systemProperties>
+								</systemProperties>
+								<log>${project.build.directory}/cargo_container_tomcat.log</log>
+							</container>
+							<configuration>
+								<!-- using defaults for now, see https://codehaus-cargo.github.io/cargo/Tomcat+7.x.html 
+									<properties> <cargo.servlet.port>${tomcat.http.port}</cargo.servlet.port> 
+									<cargo.tomcat.ajp.port>${tomcat.ajp.port}</cargo.tomcat.ajp.port> </properties> 
+									<home>${project.build.directory}/apphome</home> -->
+							</configuration>
+							<deployables>
+								<deployable>
+									<properties>
+										<context>ROOT</context>
+									</properties>
+								</deployable>
+							</deployables>
+						</configuration>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop-container-tomcat</id>
+						<phase>verify</phase>
+						<configuration>
+							<container>
+								<containerId>tomcat${tomcat.ver.major}x</containerId>
+							</container>
+							<configuration>
+								<!-- Use default values <properties> <cargo.servlet.port>${first_app.server.port}</cargo.servlet.port> 
+									</properties> <home>${project.build.directory}/tomcat_first_app</home> -->
+							</configuration>
+						</configuration>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<packaging>war</packaging>
+</project>

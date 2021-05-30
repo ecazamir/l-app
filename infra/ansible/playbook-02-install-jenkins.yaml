@@ -1,0 +1,56 @@
+---
+- name: Playbook instalare Jenkins
+  hosts: localhost
+  become: true
+  tasks:
+  - name: Instalare prerechizite Jenkins
+    apt:
+      name:
+      - openjdk-8-jdk-headless
+      state: present
+
+  - name: Adaugare cheie semnare repo Jenkins
+    apt_key:
+      url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+      state: present
+
+  - name: Instalare sursa depozit apt pentru Jenkins
+    apt_repository:
+      repo: deb https://pkg.jenkins.io/debian-stable binary/
+      state: present
+
+  - name: Instalare Jenkins
+    apt:
+      name:
+      - jenkins
+      state: present
+      update_cache: yes
+      cache_valid_time: 3600
+
+  - name: Configurare unitate serviciu Jenkins
+    lineinfile:
+      path: /etc/default/jenkins
+      create: no
+      insertafter: 'JENKINS_ARGS="--webroot'
+      line: 'JENKINS_ARGS="$JENKINS_ARGS --prefix=$PREFIX"'
+    notify: Restart Jenkins
+
+  - name: Creare cache Maven
+    file:
+      path: /var/lib/jenkins/.docker-m2-cache/repository
+      state: directory
+      mode: '0755'
+
+  - name: Adaugare user jenkins in grup Docker
+    user:
+      name: jenkins
+      append: yes
+      groups: docker
+    notify: Restart Jenkins
+
+  handlers:
+  - name: Restart Jenkins
+    service:
+      name: jenkins
+      state: restarted
+

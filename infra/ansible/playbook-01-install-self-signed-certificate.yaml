@@ -1,0 +1,37 @@
+---
+- name: Certificat SSL-TLS
+  hosts: localhost
+  become: true
+  vars:
+    cert_fqdn: "scenario.local"
+
+  tasks:
+  - name: Generare cheie privată
+    openssl_privatekey:
+      path: "/etc/ssl/private/{{ cert_fqdn }}.key.pem"
+      group: root
+      mode: '600'
+      type: RSA
+      size: 2048
+
+  - name: Generare cerere semnare certificat
+    openssl_csr:
+      path: "/etc/ssl/{{ cert_fqdn }}.csr.pem"
+      privatekey_path: "/etc/ssl/private/{{ cert_fqdn }}.key.pem"
+      common_name: "{{ cert_fqdn }}"
+      select_crypto_backend: cryptography
+      subject_alt_name:
+      - 'DNS:*.{{ cert_fqdn }}'
+      - 'DNS:{{ cert_fqdn }}'
+
+  - name: Generare certificat auto-semnat
+    openssl_certificate:
+      path: "/etc/ssl/{{ cert_fqdn }}.cert.pem"
+      privatekey_path: "/etc/ssl/private/{{ cert_fqdn }}.key.pem"
+      csr_path: "/etc/ssl/{{ cert_fqdn }}.csr.pem"
+      provider: selfsigned
+    notify: Asamblare certificat si cheie pentru HAProxy
+
+  handlers:
+  - name: Asamblare certificat si cheie pentru HAProxy
+    shell: "cat /etc/ssl/{{ cert_fqdn }}.cert.pem /etc/ssl/private/{{ cert_fqdn }}.key.pem >> /etc/ssl/cert-and-key.pem; chmod go-rwx /etc/ssl/cert-and-key.pem"

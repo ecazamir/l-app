@@ -1,0 +1,40 @@
+---
+- name: Playbook pentru instalare HAProxy
+  hosts: localhost
+  become: true
+  tasks:
+  - name: Instalare software HAProxy
+    apt:
+      name:
+      - haproxy
+      state: present
+      update_cache: yes
+      cache_valid_time: 3600
+
+  - name: Copiere configuratie HAProxy
+    copy:
+      src: './conf/{{ item }}'
+      dest: '/etc/haproxy/{{ item }}'
+      owner: root
+      group: root
+      mode: '0640'
+    loop:
+      - z1_frontend_http.cfg
+      - z1_frontend_https.cfg
+      - z2_backend_jenkins.cfg
+    notify: Restart HAProxy
+
+  - name: Configurare unitate serviciu HAProxy
+    lineinfile:
+      path: /etc/sysconfig/haproxy
+      create: yes
+      regexp: '^CONFIG='
+      line: CONFIG=/etc/haproxy
+    notify: Restart HAProxy
+
+  handlers:
+  - name: Restart HAProxy
+    service:
+      name: haproxy
+      state: restarted
+
