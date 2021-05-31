@@ -7,17 +7,11 @@ pipeline {
         }
     }
 
-    options {
-        ansiColor('xterm')
-    }
-
     stages {
 
         stage('Compile') {
             steps {
-                ansiColor('xterm') {
-                    sh 'mvn compile'
-                }
+                sh 'mvn compile'
             }
         }
 
