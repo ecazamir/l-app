@@ -10,9 +10,11 @@ pipeline {
 
     stages {
 
-        stage('Compile') {
-            steps {
-                sh 'mvn compile'
+        ansiColor('xterm') { 
+            stage('Compile') {
+                steps {
+                    sh 'mvn compile'
+                }
             }
         }
 
