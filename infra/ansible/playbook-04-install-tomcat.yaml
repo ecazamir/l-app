@@ -1,0 +1,13 @@
+---
+- name: Playbook pentru instalare Tomcat
+  hosts: localhost
+  become: true
+  tasks:
+  - name: Instalare software Tomcat
+    apt:
+      name:
+      - tomcat9
+      state: present
+      update_cache: yes
+      cache_valid_time: 3600
+
