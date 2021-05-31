@@ -45,10 +45,6 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            sshCommand remote: appserver, command: "ls -lrt"
-        }
-
         stage('Clean') {
             steps {
                 sh 'mvn clean'
