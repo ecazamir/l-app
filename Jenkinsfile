@@ -15,7 +15,9 @@ pipeline {
 
         stage('Compile') {
             steps {
-                sh 'mvn compile'
+                ansiColor('xterm') {
+                    sh 'mvn compile'
+                }
             }
         }
 
