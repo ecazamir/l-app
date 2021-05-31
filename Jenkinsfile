@@ -1,13 +1,15 @@
 pipeline {
 
-    def appserver = [:]
-    appserver.name = 'localhost'
-    appserver.host = 'localhost'
-    appserver.user = 'ubuntu'
-    appserver.password = 'password'
-    appserver.allowAnyHosts = true
 
     agent {
+        node {
+            def appserver = [:]
+            appserver.name = 'localhost'
+            appserver.host = 'localhost'
+            appserver.user = 'ubuntu'
+            appserver.password = 'password'
+            appserver.allowAnyHosts = true
+        }
         docker {
             image 'maven:3.8.1-openjdk-8'
             args '-v $HOME/.m2:/root/.m2'
