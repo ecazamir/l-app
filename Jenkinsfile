@@ -1,6 +1,5 @@
 pipeline {
 
-
     agent {
         docker {
             image 'maven:3.8.1-openjdk-8'
@@ -8,13 +7,15 @@ pipeline {
         }
     }
 
+    options {
+        ansiColor('xterm')
+    }
+
     stages {
 
-        ansiColor('xterm') { 
-            stage('Compile') {
-                steps {
-                    sh 'mvn compile'
-                }
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
             }
         }
 
