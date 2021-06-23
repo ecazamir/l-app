@@ -17,7 +17,7 @@ sudo mkdir /app; chown ubuntu:ubuntu /app
 # Clonare repository
 su - ubuntu -c "cd /app; git clone ${APP_REPOSITORY}"
 # Lansare Ansible
-# mkdir -p /app/logs
-# for PLAYBOOK in `cd /app/l-app/infra/ansible; ls playbook-*.yaml | sed -e s/playbook-// -e s/.yaml\$// | sort`; do
-# 	(su - ubuntu -c "cd /app/l-app/infra/ansible; ansible-playbook playbook-${PLAYBOOK}.yaml") > /app/logs/playbook-${PLAYBOOK}.log
-# done
+mkdir -p /app/logs
+for PLAYBOOK in `cd /app/l-app/infra/ansible; ls playbook-*.yaml | sed -e s/playbook-// -e s/.yaml\$// | sort`; do
+  (su - ubuntu -c "cd /app/l-app/infra/ansible; ansible-playbook playbook-${PLAYBOOK}.yaml") > /app/logs/playbook-${PLAYBOOK}.log
+done

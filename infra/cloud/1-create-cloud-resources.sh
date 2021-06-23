@@ -42,7 +42,6 @@ else
 fi
 
 echo "Se crează mașina virtuală..."
-export INSTANCE_NAME=sdlc-vm
 gcloud beta compute --project=${PROJECT_ID} instances create ${INSTANCE_NAME} \
   --zone=europe-central2-a --machine-type=n1-standard-2 \
   --boot-disk-size=20GB --boot-disk-type=pd-ssd --boot-disk-device-name=${INSTANCE_NAME}-boot-device \
