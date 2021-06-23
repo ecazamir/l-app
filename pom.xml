@@ -30,7 +30,7 @@
 			10.15.2.0) necesită Java 9 sau mai recent -->
 
 		<!-- Derby 10.14.2 este compatibil cu Java 8 -->
-		<derby.version>10.15.2.0</derby.version>
+		<derby.version>10.14.2.0</derby.version>
 
 		<!-- Versiuni module maven etc -->
 		<cargomaven.name>cargo-maven2-plugin</cargomaven.name>
