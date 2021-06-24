@@ -6,7 +6,7 @@
   - name: Instalare prerechizite Jenkins
     apt:
       name:
-      - openjdk-8-jdk-headless
+      - openjdk-11-jdk-headless
       state: present
 
   - name: Adaugare cheie semnare repo Jenkins
@@ -53,4 +53,3 @@
     service:
       name: jenkins
       state: restarted
-

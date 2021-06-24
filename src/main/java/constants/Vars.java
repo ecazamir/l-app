@@ -6,7 +6,7 @@ package constants;
 
 public class Vars {
 	public final static String expectedServletApiString = "3.0";
-	public final static int cargoListenerPort = 8080; 
+	public final static int cargoListenerPort = 8080;
 	/* Containerul Crago este invocat de Maven. Numărul de port trebuie să corespundă
 	 * cu numărul din ./pom.xml */
 	public final static String servletApiUrlPath = "/servletapiversion";

@@ -6,6 +6,11 @@ pipeline {
         }
     }
     stages {
+        stage('Clean - Pre') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
         stage('Compile') {
             steps {
                 sh 'mvn compile'
@@ -37,7 +42,7 @@ pipeline {
                 }
             }
         }
-        stage('Clean') {
+        stage('Clean - Post') {
             steps {
                 sh 'mvn clean'
             }
